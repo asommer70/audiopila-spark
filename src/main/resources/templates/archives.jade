@@ -1,0 +1,24 @@
+extends ./layout.jade
+
+block content
+    h2 Archives
+
+    br
+
+    div
+        strong New Archive
+        form(method="post", action="/archives")
+            label
+                Path
+            br
+            input(type="text", name="path", placeholder="Path to directory with audio files.")
+            br
+            br
+            input(type="submit", value="Save Archive", class="button success")
+
+
+    ul
+        for archive in archives
+            li
+                strong=archive.name
+                p=archive.path
