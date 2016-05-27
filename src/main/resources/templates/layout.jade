@@ -11,4 +11,15 @@ html(lang="en")
                 a(href="/archives") Archives
         hr
 
+        div(class="#{flash.type} callout text-center", data-closable="slide-out-right")
+            p
+                |Flash:
+                span=flash.message
+            p Title:
+                span=title
+            p Archives:
+                span=archives
+            button(class="close-button", aria-label="Dismiss alert", type="button", data-close)
+            span(aria-hidden="true")&times;
+
         block content

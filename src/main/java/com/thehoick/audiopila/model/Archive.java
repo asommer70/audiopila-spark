@@ -11,7 +11,11 @@ public class Archive {
     public Archive(String path) {
         this.path = path;
         String[] parts = path.split("/");
-        this.name = parts[parts.length - 1];
+        if (parts.length >= 2) {
+            this.name = parts[parts.length - 2] + " " + parts[parts.length - 1];
+        } else {
+            this.name = parts[parts.length - 1];
+        }
     }
 
     @Override
