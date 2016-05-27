@@ -5,16 +5,15 @@ block content
 
     br
 
-    div
-        strong New Archive
-        form(method="post", action="/archives")
-            label
-                Path
-            br
-            input(type="text", name="path", placeholder="Path to directory with audio files.")
-            br
-            br
-            input(type="submit", value="Save Archive", class="button success")
+    .row
+        .columns.large-4
+            button(class="button small", data-toggle="new_archive") New Archive
+            form(id="new_archive", class="hide", method="post", action="/archives", data-toggler=".hide")
+                label
+                    Path
+                br
+                input(type="text", name="path", placeholder="Path to directory with audio files.")
+                input(type="submit", value="Save Archive", class="button small success")
 
 
     ul

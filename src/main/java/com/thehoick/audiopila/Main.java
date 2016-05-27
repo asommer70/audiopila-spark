@@ -22,7 +22,7 @@ public class Main {
     private static final java.lang.String FLASH_TYPE_KEY = "flash_type";
 
     public static void main(String[] args) {
-        staticFileLocation("/public");
+        staticFiles.location("/public");
         ArchiveDAO dao = new SimpleArchiveDAO();
         Map<String, Object> model = new HashMap<>();
 
