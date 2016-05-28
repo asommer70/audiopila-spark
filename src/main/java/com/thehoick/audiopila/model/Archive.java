@@ -10,6 +10,7 @@ public class Archive {
     private String name;
     private String path;
     private Date syncDate;
+    private int deviceId;
 
     public Archive(String path) throws NotDirectoryException {
         // Check path exists.
@@ -54,6 +55,10 @@ public class Archive {
 
     public String getPath() {
         return path;
+    }
+
+    public int getDeviceId() {
+        return deviceId;
     }
 
     @Override

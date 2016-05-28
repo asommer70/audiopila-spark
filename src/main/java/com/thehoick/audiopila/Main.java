@@ -27,6 +27,8 @@ public class Main {
         ArchiveDAO dao = new SimpleArchiveDAO();
         Map<String, Object> model = new HashMap<>();
 
+        // TODO:as add Device to database and to Archive entries as well.
+
         // TODO:as maybe create a JSON API as well...
 
         before((req, res) -> {

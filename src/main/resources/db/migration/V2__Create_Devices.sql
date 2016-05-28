@@ -1,0 +1,15 @@
+CREATE TABLE IF NOT EXISTS devices (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  name VARCHAR UNIQUE,
+  platform VARCHAR
+);
+
+DROP TABLE IF EXISTS archives;
+CREATE TABLE IF NOT EXISTS archives (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  name VARCHAR,
+  path VARCHAR,
+  syncDate Date,
+  deviceId INTEGER,
+  FOREIGN KEY(deviceId) REFERENCES devices(id)
+);

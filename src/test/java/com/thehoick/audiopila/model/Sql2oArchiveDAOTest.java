@@ -11,7 +11,10 @@ import org.sql2o.Sql2o;
 import org.sql2o.Sql2oException;
 import org.sqlite.ExtendedCommand;
 
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.NotDirectoryException;
+import java.nio.file.Paths;
 import java.util.List;
 
 import static org.junit.Assert.*;
@@ -31,13 +34,14 @@ public class Sql2oArchiveDAOTest {
 
     public String migrate() {
         String dbPath = this.getClass().getResource("/db/").toString();
-        System.out.println("dbPath: " + dbPath);
+
         // Live database.
 //        String connectionString = "jdbc:sqlite:" + dbPath + "audiopila.db";
         // Test database.
         String connectionString = "jdbc:sqlite:" + dbPath + "test.db";
 
         // Uncomment to perform migration.
+        // May have to delete database first to avoide checksum mismatch...
 //        Flyway flyway = new Flyway();
 //        flyway.setDataSource(connectionString, null, null);
 //        flyway.migrate();
@@ -96,8 +100,6 @@ public class Sql2oArchiveDAOTest {
 
         assertEquals(savedArchive, archive);
     }
-
-    // TODO:as add the device name to the archives table... or create a devices table and link it to the archives table.
 
     @Test
     public void existingArchiveCanBeUpdated() throws Exception {
