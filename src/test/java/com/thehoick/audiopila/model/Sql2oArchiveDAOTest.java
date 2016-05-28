@@ -11,6 +11,7 @@ import org.sql2o.Sql2o;
 import org.sql2o.Sql2oException;
 import org.sqlite.ExtendedCommand;
 
+import java.nio.file.NotDirectoryException;
 import java.util.List;
 
 import static org.junit.Assert.*;
@@ -67,7 +68,11 @@ public class Sql2oArchiveDAOTest {
         assertNotEquals(originalId, archive.getId());
     }
 
-    // TODO:as test that a directory in Archive path exists before creating it.
+    @Test(expected = NotDirectoryException.class)
+    public void archiveIsNotAddedIfBadDirectory() throws Exception {
+        Archive archive = new Archive("/Users/adam/Musicssss");
+        dao.add(archive);
+    }
 
     @Test
     public void allCoursesAreReturnedByFindAll() throws Exception {

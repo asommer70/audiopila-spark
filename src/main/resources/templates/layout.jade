@@ -16,10 +16,9 @@ html(lang="en")
             hr
 
             .row
-                .columns.large-4
+                .columns.large-5
                     if flash
                         div(class="#{flash.type} callout", data-closable)
-                            h5=flash.type
                             p=flash.message
 
                             button(class="close-button", aria-label="Dismiss alert", type="button", data-close)

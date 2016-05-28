@@ -9,6 +9,7 @@ import spark.Request;
 import spark.template.jade.JadeTemplateEngine;
 
 import java.lang.reflect.Array;
+import java.nio.file.NotDirectoryException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -39,21 +40,31 @@ public class Main {
             model.put("flash", flash);
         });
 
+
+        // GET / (index of Audios)
         get("/", (req, res) -> new ModelAndView(model, "index"), new JadeTemplateEngine());
 
-        post("/archives", (req, res) -> {
-            Archive archive = new Archive(req.queryParams("path"));
-            dao.add(archive);
 
-            setFlashMessage(req, "Archive added.", "success");
-            res.redirect("/archives");
-            return null;
-        });
-
+        // GET /archives (index of Archives)
         get("/archives", (req, res) -> {
             model.put("archives", dao.findAll());
             return new ModelAndView(model, "archives");
         }, new JadeTemplateEngine());
+
+
+        // POST /archives (create Archive)
+        post("/archives", (req, res) -> {
+            try {
+                Archive archive = new Archive(req.queryParams("path"));
+                dao.add(archive);
+                setFlashMessage(req, "Archive added.", "success");
+                res.redirect("/archives");
+            } catch (NotDirectoryException e) {
+                setFlashMessage(req, "Archive not added. Error: " + e.getMessage(), "alert");
+                res.redirect("/archives");
+            }
+            return null;
+        });
 
         enableDebugScreen();
     }

@@ -1,5 +1,8 @@
 package com.thehoick.audiopila.model;
 
+import java.nio.file.Files;
+import java.nio.file.NotDirectoryException;
+import java.nio.file.Paths;
 import java.util.Date;
 
 public class Archive {
@@ -8,7 +11,12 @@ public class Archive {
     private String path;
     private Date syncDate;
 
-    public Archive(String path) {
+    public Archive(String path) throws NotDirectoryException {
+        // Check path exists.
+        if (Files.notExists(Paths.get(path))) {
+            throw new NotDirectoryException("Not a valid Archive directory.");
+        }
+
         this.path = path;
         String[] parts = path.split("/");
         if (parts.length >= 2) {
