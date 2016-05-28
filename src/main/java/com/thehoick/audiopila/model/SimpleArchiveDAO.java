@@ -1,5 +1,7 @@
 package com.thehoick.audiopila.model;
 
+import com.thehoick.audiopila.exc.DAOException;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,12 +13,18 @@ public class SimpleArchiveDAO implements ArchiveDAO {
     }
 
     @Override
-    public boolean add(Archive archive) {
-        return archives.add(archive);
+    public void add(Archive archive) {
+        archives.add(archive);
     }
 
     @Override
     public List<Archive> findAll() {
         return new ArrayList<>(archives);
+    }
+
+
+    @Override
+    public Archive findById(int archiveId) throws DAOException {
+        return null;
     }
 }
