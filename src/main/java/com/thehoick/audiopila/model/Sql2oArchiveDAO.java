@@ -39,8 +39,9 @@ public class Sql2oArchiveDAO implements ArchiveDAO {
     @Override
     public Archive findById(int archiveId) throws DAOException {
         try (Connection con = sql2o.open()) {
-            return con.createQuery("SELECT * from archives where id = " + archiveId)
-                    .executeAndFetch(Archive.class).get(0);
+            return con.createQuery("SELECT * from archives where id = :id;")
+                    .addParameter("id", archiveId)
+                    .executeAndFetchFirst(Archive.class);
         }
     }
 }

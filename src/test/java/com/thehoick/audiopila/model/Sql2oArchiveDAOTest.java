@@ -83,14 +83,16 @@ public class Sql2oArchiveDAOTest {
     }
 
     @Test
-    public void findById() throws Exception {
+    public void existingArchivesCanBeFoundById() throws Exception {
         Archive archive = new Archive("/Volumes/TarDisk/Music");
         dao.add(archive);
 
         Archive savedArchive = dao.findById(archive.getId());
 
-        assertEquals(savedArchive.getId(), archive.getId());
+        assertEquals(savedArchive, archive);
     }
+
+    // TODO:as add the device name to the archives table... or create a devices table and link it to the archives table.
 
     // TODO:as create test for updating an Archive.
 

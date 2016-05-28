@@ -26,6 +26,7 @@ public class Main {
         ArchiveDAO dao = new SimpleArchiveDAO();
         Map<String, Object> model = new HashMap<>();
 
+        // TODO:as maybe create a JSON API as well...
 
         before((req, res) -> {
             if (req.cookie("device") != null) {
