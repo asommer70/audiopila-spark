@@ -27,4 +27,14 @@ public class SimpleArchiveDAO implements ArchiveDAO {
     public Archive findById(int archiveId) throws DAOException {
         return null;
     }
+
+    @Override
+    public Archive update(Archive archive, String field, String value) throws DAOException {
+        return null;
+    }
+
+    @Override
+    public void destroy(Archive archive) throws DAOException {
+
+    }
 }

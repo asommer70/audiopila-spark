@@ -1,6 +1,7 @@
 package com.thehoick.audiopila.model;
 
 import com.thehoick.audiopila.exc.DAOException;
+import javafx.scene.shape.Arc;
 import org.sql2o.Connection;
 import org.sql2o.Sql2o;
 import org.sql2o.Sql2oException;
@@ -42,6 +43,29 @@ public class Sql2oArchiveDAO implements ArchiveDAO {
             return con.createQuery("SELECT * from archives where id = :id;")
                     .addParameter("id", archiveId)
                     .executeAndFetchFirst(Archive.class);
+        }
+    }
+
+    @Override
+    public Archive update(Archive archive, String field, String value) throws DAOException {
+        try (Connection con = sql2o.open()) {
+            con.createQuery("update archives set " + field + " = :value where id = :id;")
+                    .addParameter("value", value)
+                    .addParameter("id", archive.getId())
+                    .executeUpdate();
+
+            return con.createQuery("SELECT * from archives where id = :id;")
+                    .addParameter("id", archive.getId())
+                    .executeAndFetchFirst(Archive.class);
+        }
+    }
+
+    @Override
+    public void destroy(Archive archive) throws DAOException {
+        try (Connection con = sql2o.open()) {
+            con.createQuery("delete from archives where id = :id;")
+                    .addParameter("id", archive.getId())
+                    .executeUpdate();
         }
     }
 }

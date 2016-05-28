@@ -99,7 +99,27 @@ public class Sql2oArchiveDAOTest {
 
     // TODO:as add the device name to the archives table... or create a devices table and link it to the archives table.
 
-    // TODO:as create test for updating an Archive.
+    @Test
+    public void existingArchiveCanBeUpdated() throws Exception {
+        Archive archive = new Archive("/Volumes/TarDisk/Music");
+        dao.add(archive);
 
-    // TODO:as create test for deleting an Archive.
+        assertEquals(archive.getPath(), "/Volumes/TarDisk/Music");
+        archive = dao.update(archive, "path", "/Volumes/sands/Music");
+        assertEquals(archive.getPath(), "/Volumes/sands/Music");
+    }
+
+    @Test
+    public void deleteRemovesExistingArchive() throws Exception {
+        Archive archive = new Archive("/Users/adam/Downloads");
+        dao.add(archive);
+        assertEquals(dao.findAll().size(), 1);
+
+        dao.destroy(archive);
+        Archive destroyedArchive = dao.findById(archive.getId());
+
+        assertEquals(destroyedArchive, null);
+        assertEquals(dao.findAll().size(), 0);
+    }
+
 }
