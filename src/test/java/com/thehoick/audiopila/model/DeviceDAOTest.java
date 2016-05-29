@@ -88,6 +88,15 @@ public class DeviceDAOTest {
     }
 
     @Test
+    public void existingDevicesCanBeFoundByName() throws Exception {
+        dao.addDevice(device);
+
+        Device savedDevice = dao.findDeviceByName("linux.arse");
+
+        assertEquals(savedDevice, device);
+    }
+
+    @Test
     public void existingDeviceCanBeUpdated() throws Exception {
         dao.addDevice(device);
 

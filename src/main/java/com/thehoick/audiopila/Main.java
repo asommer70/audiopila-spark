@@ -1,12 +1,14 @@
 package com.thehoick.audiopila;
 
+import com.sun.java.browser.dom.DOMAccessException;
+import com.thehoick.audiopila.exc.DAOException;
 import com.thehoick.audiopila.model.*;
-import org.sql2o.Connection;
 import org.sql2o.Sql2o;
 import spark.ModelAndView;
 import spark.Request;
 import spark.template.jade.JadeTemplateEngine;
 
+import java.net.UnknownHostException;
 import java.nio.file.NotDirectoryException;
 import java.util.HashMap;
 import java.util.Map;
@@ -17,7 +19,9 @@ import static spark.debug.DebugScreen.enableDebugScreen;
 public class Main {
     private static final java.lang.String FLASH_MESSAGE_KEY = "flash_message";
     private static final java.lang.String FLASH_TYPE_KEY = "flash_type";
-    private Device device;
+    private static Device device;
+    private static String hostname;
+    private static Sql2oSqliteDAO dao;
 
     public static void main(String[] args) {
         String database = "audiopila.db";
@@ -36,23 +40,22 @@ public class Main {
         String dbPath = Main.class.getClass().getResource("/db/").toString();
         String connectionString = "jdbc:sqlite:" + dbPath + database;
         Sql2o sql2o = new Sql2o(connectionString, "", "");
-        Sql2oSqliteDAO dao = new Sql2oSqliteDAO(sql2o);
-        Connection con = sql2o.open();
+        dao = new Sql2oSqliteDAO(sql2o);
 
         Map<String, Object> model = new HashMap<>();
 
-        // TODO:as addArchive Device to database and to Archive entries as well.
-
+        Main.setHostname();
+        if (device == null) Main.setDevice();
 
         // TODO:as maybe create a JSON API as well...
 
         before((req, res) -> {
             if (req.cookie("device") != null) {
-                // TODO:as addArchive get the device from the req UserAgent somehow...
                 req.attribute("device", req.cookie("device"));
             }
 
             model.put("title", "Audio Pila!");
+            model.put("device", device);
             HashMap<String, String> flash = captureFlashMessage(req);
             model.put("flash", flash);
         });
@@ -64,7 +67,7 @@ public class Main {
 
         // GET /archives (index of Archives)
         get("/archives", (req, res) -> {
-            model.put("archives", dao.findArchives());
+            model.put("archives", dao.findArchives(device.getId()));
             return new ModelAndView(model, "archives");
         }, new JadeTemplateEngine());
 
@@ -73,6 +76,7 @@ public class Main {
         post("/archives", (req, res) -> {
             try {
                 Archive archive = new Archive(req.queryParams("path"));
+                archive.setDeviceId(device.getId());
                 dao.addArchive(archive);
                 setFlashMessage(req, "Archive added.", "success");
                 res.redirect("/archives");
@@ -99,8 +103,8 @@ public class Main {
         if (!req.session().attributes().contains(FLASH_MESSAGE_KEY)) {
             return null;
         }
-        String txt = (String) req.session().attribute(FLASH_MESSAGE_KEY);
-        String type = (String) req.session().attribute(FLASH_TYPE_KEY);
+        String txt = req.session().attribute(FLASH_MESSAGE_KEY);
+        String type = req.session().attribute(FLASH_TYPE_KEY);
         HashMap<String, String> flash = new HashMap<>();
         flash.put("message", txt);
         flash.put("type", type);
@@ -114,5 +118,32 @@ public class Main {
             req.session().removeAttribute(FLASH_TYPE_KEY);
         }
         return flash;
+    }
+
+    private static void setHostname() {
+        try {
+            hostname = java.net.InetAddress.getLocalHost().getHostName();
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static void setDevice() {
+        try {
+            device = dao.findDeviceByName(hostname);
+        } catch (DOMAccessException e) {
+            e.printStackTrace();
+        }
+
+        if (device == null) {
+            String osName = System.getProperty("os.name");
+            Device thisDevice = new Device(hostname, osName);
+            try {
+                dao.addDevice(thisDevice);
+            } catch (DAOException e) {
+                e.printStackTrace();
+            }
+            device = thisDevice;
+        }
     }
 }

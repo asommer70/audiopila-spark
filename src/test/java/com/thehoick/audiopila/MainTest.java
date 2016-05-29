@@ -69,6 +69,12 @@ public class MainTest {
 
     @Test
     public void archiveDeviceIsSet() throws Exception {
+        MainResponse res = client.request("GET", "/archives", null);
+        assertEquals(200, res.getStatus());
 
+        Document doc = Jsoup.parse(res.getBody());
+
+        Elements device = doc.select("#device_name");
+        assertEquals(device.get(0).text(), "linux.arse");
     }
 }

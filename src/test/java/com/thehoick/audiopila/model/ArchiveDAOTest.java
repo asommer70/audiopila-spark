@@ -59,6 +59,7 @@ public class ArchiveDAOTest {
     @Test
     public void addingArchiveSetsId() throws Exception {
         Archive archive = new Archive("/Users/adam/Music");
+        archive.setDeviceId(device.getId());
         int originalId = archive.getId();
 
         dao.addArchive(archive);
@@ -82,25 +83,28 @@ public class ArchiveDAOTest {
     @Test(expected = NotDirectoryException.class)
     public void archiveIsNotAddedIfBadDirectory() throws Exception {
         Archive archive = new Archive("/Users/adam/Musicssss");
+        archive.setDeviceId(device.getId());
         dao.addArchive(archive);
     }
 
     @Test
-    public void allArchivesAreReturnedByFindArchives() throws Exception {
+    public void archivesForDeviceAreReturnedByFindArchives() throws Exception {
         Archive archive = new Archive("/Volumes/sands/Music");
+        archive.setDeviceId(device.getId());
         dao.addArchive(archive);
 
-        assertEquals(1, dao.findArchives().size());
+        assertEquals(1, dao.findArchives(device.getId()).size());
     }
 
     @Test
     public void noArchivesReturnsEmptyList() throws Exception {
-        assertEquals(dao.findArchives().size(), 0);
+        assertEquals(dao.findArchives(device.getId()).size(), 0);
     }
 
     @Test
     public void existingArchivesCanBeFoundById() throws Exception {
         Archive archive = new Archive("/Volumes/TarDisk/Music");
+        archive.setDeviceId(device.getId());
         dao.addArchive(archive);
 
         Archive savedArchive = dao.findArchiveById(archive.getId());
@@ -111,6 +115,7 @@ public class ArchiveDAOTest {
     @Test
     public void existingArchiveCanBeUpdated() throws Exception {
         Archive archive = new Archive("/Volumes/TarDisk/Music");
+        archive.setDeviceId(device.getId());
         dao.addArchive(archive);
 
         assertEquals(archive.getPath(), "/Volumes/TarDisk/Music");
@@ -121,19 +126,15 @@ public class ArchiveDAOTest {
     @Test
     public void deleteRemovesExistingArchive() throws Exception {
         Archive archive = new Archive("/Users/adam/Downloads");
+        archive.setDeviceId(device.getId());
         dao.addArchive(archive);
-        assertEquals(dao.findArchives().size(), 1);
+        assertEquals(dao.findArchives(device.getId()).size(), 1);
 
         dao.destroyArchive(archive);
         Archive destroyedArchive = dao.findArchiveById(archive.getId());
 
         assertEquals(destroyedArchive, null);
-        assertEquals(dao.findArchives().size(), 0);
-
-//        System.getProperties().list(System.out);
-        String osName  = System.getProperty("os.name");
-        String hostname = java.net.InetAddress.getLocalHost().getHostName();
-        System.out.println("os: " + osName + " hostname: " + hostname);
+        assertEquals(dao.findArchives(device.getId()).size(), 0);
     }
 
 }

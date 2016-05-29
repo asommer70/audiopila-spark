@@ -1,5 +1,6 @@
 package com.thehoick.audiopila.model;
 
+import com.sun.java.browser.dom.DOMAccessException;
 import com.thehoick.audiopila.exc.DAOException;
 import org.sql2o.Connection;
 import org.sql2o.Sql2o;
@@ -29,9 +30,10 @@ public class Sql2oSqliteDAO implements SqliteDAO {
     }
 
     @Override
-    public List<Archive> findArchives() throws DAOException {
+    public List<Archive> findArchives(int deviceId) throws DAOException {
         try (Connection con = sql2o.open()) {
-            return con.createQuery("SELECT * from archives")
+            return con.createQuery("SELECT * from archives where deviceId = :id")
+                    .addParameter("id", deviceId)
                     .executeAndFetch(Archive.class);
         }
     }
@@ -95,6 +97,15 @@ public class Sql2oSqliteDAO implements SqliteDAO {
         try (Connection con = sql2o.open()) {
             return con.createQuery("SELECT * from devices where id = :id;")
                     .addParameter("id", deviceId)
+                    .executeAndFetchFirst(Device.class);
+        }
+    }
+
+    @Override
+    public Device findDeviceByName(String name) throws DOMAccessException {
+        try (Connection con = sql2o.open()) {
+            return con.createQuery("SELECT * from devices where name = :name;")
+                    .addParameter("name", name)
                     .executeAndFetchFirst(Device.class);
         }
     }
