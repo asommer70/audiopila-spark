@@ -34,6 +34,7 @@ public class Archive {
                 ", name='" + name + '\'' +
                 ", path='" + path + '\'' +
                 ", syncDate=" + syncDate +
+                ", deviceId=" + deviceId +
                 '}';
     }
 
@@ -82,5 +83,9 @@ public class Archive {
         result = 31 * result + path.hashCode();
         result = 31 * result + (syncDate != null ? syncDate.hashCode() : 0);
         return result;
+    }
+
+    public void setDeviceId(int deviceId) {
+        this.deviceId = deviceId;
     }
 }

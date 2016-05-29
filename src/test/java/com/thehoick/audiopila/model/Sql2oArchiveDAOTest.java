@@ -23,6 +23,7 @@ public class Sql2oArchiveDAOTest {
     private Sql2oArchiveDAO dao;
     Sql2o sql2o;
     Connection con;
+    private Device device;
 
     @Before
     public void setUp() throws Exception {
@@ -30,6 +31,10 @@ public class Sql2oArchiveDAOTest {
         sql2o = new Sql2o(connectionString, "", "");
         dao = new Sql2oArchiveDAO(sql2o);
         con = sql2o.open();
+
+        String hostname = java.net.InetAddress.getLocalHost().getHostName();
+        String osName = System.getProperty("os.name");
+        device = new Device(hostname, osName);
     }
 
     public String migrate() {
@@ -70,6 +75,19 @@ public class Sql2oArchiveDAOTest {
         dao.add(archive);
 
         assertNotEquals(originalId, archive.getId());
+    }
+
+    @Test
+    public void addingArchiveSetsDeviceId() throws Exception {
+        Archive archive = new Archive("/Users/adam/Music");
+        int originalId = archive.getId();
+
+        archive.setDeviceId(device.getId());
+        dao.add(archive);
+        Archive dbArchive = dao.findById(archive.getId());
+
+        assertNotEquals(originalId, dbArchive.getId());
+        assertEquals(dbArchive.getDeviceId(), device.getId());
     }
 
     @Test(expected = NotDirectoryException.class)
@@ -122,6 +140,11 @@ public class Sql2oArchiveDAOTest {
 
         assertEquals(destroyedArchive, null);
         assertEquals(dao.findAll().size(), 0);
+
+//        System.getProperties().list(System.out);
+        String osName  = System.getProperty("os.name");
+        String hostname = java.net.InetAddress.getLocalHost().getHostName();
+        System.out.println("os: " + osName + " hostname: " + hostname);
     }
 
 }

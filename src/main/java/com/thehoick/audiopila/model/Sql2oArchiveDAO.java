@@ -1,7 +1,6 @@
 package com.thehoick.audiopila.model;
 
 import com.thehoick.audiopila.exc.DAOException;
-import javafx.scene.shape.Arc;
 import org.sql2o.Connection;
 import org.sql2o.Sql2o;
 import org.sql2o.Sql2oException;
@@ -17,7 +16,7 @@ public class Sql2oArchiveDAO implements ArchiveDAO {
 
     @Override
     public void add(Archive archive) throws DAOException {
-        String sql = "INSERT INTO archives(name, path) VALUES (:name, :path)";
+        String sql = "INSERT INTO archives(name, path, deviceId) VALUES (:name, :path, :deviceId)";
         try (Connection con = sql2o.open()) {
             int id = (int) con.createQuery(sql)
                     .bind(archive)
