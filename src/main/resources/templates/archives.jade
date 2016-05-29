@@ -15,8 +15,9 @@ block content
                 input(type="text", name="path", placeholder="Path to directory with audio files.")
                 input(type="submit", value="Save Archive", class="button small success")
 
+    br
 
-    ul
+    ul(class="no-bullet")
         for archive in archives
             li
                 strong=archive.name

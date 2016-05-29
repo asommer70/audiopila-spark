@@ -1,18 +1,17 @@
 package com.thehoick.audiopila;
 
-import com.sun.tools.doclets.formats.html.SourceToHTMLConverter;
 import com.thehoick.audiopila.model.Archive;
 import com.thehoick.audiopila.model.ArchiveDAO;
-import com.thehoick.audiopila.model.SimpleArchiveDAO;
+import com.thehoick.audiopila.model.Sql2oArchiveDAO;
+import com.thehoick.audiopila.model.Sql2oDeviceDAO;
+import org.sql2o.Connection;
+import org.sql2o.Sql2o;
 import spark.ModelAndView;
 import spark.Request;
 import spark.template.jade.JadeTemplateEngine;
 
-import java.lang.reflect.Array;
 import java.nio.file.NotDirectoryException;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import static spark.Spark.*;
@@ -23,8 +22,26 @@ public class Main {
     private static final java.lang.String FLASH_TYPE_KEY = "flash_type";
 
     public static void main(String[] args) {
+        String database = "audiopila.db";
+        if (args.length > 0) {
+            if (args.length != 2) {
+                System.out.println("java Main <port> <database>");
+                System.exit(0);
+            }
+            port(Integer.parseInt(args[0]));
+            database = args[1];
+            System.out.println("port: " + args[0] + ",  database: " + database);
+        }
+
         staticFiles.location("/public");
-        ArchiveDAO dao = new SimpleArchiveDAO();
+
+        String dbPath = Main.class.getClass().getResource("/db/").toString();
+        String connectionString = "jdbc:sqlite:" + dbPath + database;
+        Sql2o sql2o = new Sql2o(connectionString, "", "");
+        Sql2oArchiveDAO dao = new Sql2oArchiveDAO(sql2o);
+        Connection con = sql2o.open();
+        ArchiveDAO archiveDAO = new Sql2oArchiveDAO(sql2o);
+
         Map<String, Object> model = new HashMap<>();
 
         // TODO:as add Device to database and to Archive entries as well.
