@@ -1,26 +1,19 @@
 package com.thehoick.audiopila.model;
 
 import com.thehoick.audiopila.exc.DAOException;
-import javafx.scene.shape.Arc;
-import org.flywaydb.core.Flyway;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.sql2o.Connection;
 import org.sql2o.Sql2o;
 import org.sql2o.Sql2oException;
-import org.sqlite.ExtendedCommand;
 
-import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.NotDirectoryException;
-import java.nio.file.Paths;
-import java.util.List;
 
 import static org.junit.Assert.*;
 
-public class Sql2oArchiveDAOTest {
-    private Sql2oArchiveDAO dao;
+public class ArchiveDAOTest {
+    private Sql2oSqliteDAO dao;
     Sql2o sql2o;
     Connection con;
     private Device device;
@@ -29,7 +22,7 @@ public class Sql2oArchiveDAOTest {
     public void setUp() throws Exception {
         String connectionString = migrate();
         sql2o = new Sql2o(connectionString, "", "");
-        dao = new Sql2oArchiveDAO(sql2o);
+        dao = new Sql2oSqliteDAO(sql2o);
         con = sql2o.open();
 
         String hostname = java.net.InetAddress.getLocalHost().getHostName();
@@ -57,13 +50,9 @@ public class Sql2oArchiveDAOTest {
     @After
     public void tearDown() throws Exception {
         // Clear the data manually.
-        String sql = "delete from archives; delete from sqlite_sequence where name = 'archives';";
-        try {
-            con.createQuery(sql)
-                .executeUpdate();
-        } catch (Sql2oException ex) {
-            throw new DAOException(ex, "Problem adding archive.");
-        }
+        String sql = "delete from archives; delete from devices; delete from sqlite_sequence;";
+        con.createQuery(sql)
+            .executeUpdate();
         con.close();
     }
 
@@ -72,7 +61,7 @@ public class Sql2oArchiveDAOTest {
         Archive archive = new Archive("/Users/adam/Music");
         int originalId = archive.getId();
 
-        dao.add(archive);
+        dao.addArchive(archive);
 
         assertNotEquals(originalId, archive.getId());
     }
@@ -83,8 +72,8 @@ public class Sql2oArchiveDAOTest {
         int originalId = archive.getId();
 
         archive.setDeviceId(device.getId());
-        dao.add(archive);
-        Archive dbArchive = dao.findById(archive.getId());
+        dao.addArchive(archive);
+        Archive dbArchive = dao.findArchiveById(archive.getId());
 
         assertNotEquals(originalId, dbArchive.getId());
         assertEquals(dbArchive.getDeviceId(), device.getId());
@@ -93,28 +82,28 @@ public class Sql2oArchiveDAOTest {
     @Test(expected = NotDirectoryException.class)
     public void archiveIsNotAddedIfBadDirectory() throws Exception {
         Archive archive = new Archive("/Users/adam/Musicssss");
-        dao.add(archive);
+        dao.addArchive(archive);
     }
 
     @Test
-    public void allCoursesAreReturnedByFindAll() throws Exception {
+    public void allArchivesAreReturnedByFindArchives() throws Exception {
         Archive archive = new Archive("/Volumes/sands/Music");
-        dao.add(archive);
+        dao.addArchive(archive);
 
-        assertEquals(dao.findAll().size(), 1);
+        assertEquals(1, dao.findArchives().size());
     }
 
     @Test
     public void noArchivesReturnsEmptyList() throws Exception {
-        assertEquals(dao.findAll().size(), 0);
+        assertEquals(dao.findArchives().size(), 0);
     }
 
     @Test
     public void existingArchivesCanBeFoundById() throws Exception {
         Archive archive = new Archive("/Volumes/TarDisk/Music");
-        dao.add(archive);
+        dao.addArchive(archive);
 
-        Archive savedArchive = dao.findById(archive.getId());
+        Archive savedArchive = dao.findArchiveById(archive.getId());
 
         assertEquals(savedArchive, archive);
     }
@@ -122,24 +111,24 @@ public class Sql2oArchiveDAOTest {
     @Test
     public void existingArchiveCanBeUpdated() throws Exception {
         Archive archive = new Archive("/Volumes/TarDisk/Music");
-        dao.add(archive);
+        dao.addArchive(archive);
 
         assertEquals(archive.getPath(), "/Volumes/TarDisk/Music");
-        archive = dao.update(archive, "path", "/Volumes/sands/Music");
+        archive = dao.updateArchive(archive, "path", "/Volumes/sands/Music");
         assertEquals(archive.getPath(), "/Volumes/sands/Music");
     }
 
     @Test
     public void deleteRemovesExistingArchive() throws Exception {
         Archive archive = new Archive("/Users/adam/Downloads");
-        dao.add(archive);
-        assertEquals(dao.findAll().size(), 1);
+        dao.addArchive(archive);
+        assertEquals(dao.findArchives().size(), 1);
 
-        dao.destroy(archive);
-        Archive destroyedArchive = dao.findById(archive.getId());
+        dao.destroyArchive(archive);
+        Archive destroyedArchive = dao.findArchiveById(archive.getId());
 
         assertEquals(destroyedArchive, null);
-        assertEquals(dao.findAll().size(), 0);
+        assertEquals(dao.findArchives().size(), 0);
 
 //        System.getProperties().list(System.out);
         String osName  = System.getProperty("os.name");

@@ -1,9 +1,6 @@
 package com.thehoick.audiopila;
 
-import com.thehoick.audiopila.model.Archive;
-import com.thehoick.audiopila.model.ArchiveDAO;
-import com.thehoick.audiopila.model.Sql2oArchiveDAO;
-import com.thehoick.audiopila.model.Sql2oDeviceDAO;
+import com.thehoick.audiopila.model.*;
 import org.sql2o.Connection;
 import org.sql2o.Sql2o;
 import spark.ModelAndView;
@@ -20,6 +17,7 @@ import static spark.debug.DebugScreen.enableDebugScreen;
 public class Main {
     private static final java.lang.String FLASH_MESSAGE_KEY = "flash_message";
     private static final java.lang.String FLASH_TYPE_KEY = "flash_type";
+    private Device device;
 
     public static void main(String[] args) {
         String database = "audiopila.db";
@@ -38,19 +36,19 @@ public class Main {
         String dbPath = Main.class.getClass().getResource("/db/").toString();
         String connectionString = "jdbc:sqlite:" + dbPath + database;
         Sql2o sql2o = new Sql2o(connectionString, "", "");
-        Sql2oArchiveDAO dao = new Sql2oArchiveDAO(sql2o);
+        Sql2oSqliteDAO dao = new Sql2oSqliteDAO(sql2o);
         Connection con = sql2o.open();
-        ArchiveDAO archiveDAO = new Sql2oArchiveDAO(sql2o);
 
         Map<String, Object> model = new HashMap<>();
 
-        // TODO:as add Device to database and to Archive entries as well.
+        // TODO:as addArchive Device to database and to Archive entries as well.
+
 
         // TODO:as maybe create a JSON API as well...
 
         before((req, res) -> {
             if (req.cookie("device") != null) {
-                // TODO:as add get the device from the req UserAgent somehow...
+                // TODO:as addArchive get the device from the req UserAgent somehow...
                 req.attribute("device", req.cookie("device"));
             }
 
@@ -66,7 +64,7 @@ public class Main {
 
         // GET /archives (index of Archives)
         get("/archives", (req, res) -> {
-            model.put("archives", dao.findAll());
+            model.put("archives", dao.findArchives());
             return new ModelAndView(model, "archives");
         }, new JadeTemplateEngine());
 
@@ -75,7 +73,7 @@ public class Main {
         post("/archives", (req, res) -> {
             try {
                 Archive archive = new Archive(req.queryParams("path"));
-                dao.add(archive);
+                dao.addArchive(archive);
                 setFlashMessage(req, "Archive added.", "success");
                 res.redirect("/archives");
             } catch (NotDirectoryException e) {

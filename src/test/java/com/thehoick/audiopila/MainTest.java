@@ -43,6 +43,10 @@ public class MainTest {
 
     @After
     public void tearDown() throws Exception {
+        // Clear the data manually.
+        String sql = "delete from archives; delete from devices; delete from sqlite_sequence;";
+        con.createQuery(sql)
+                .executeUpdate();
         con.close();
     }
 
@@ -61,5 +65,10 @@ public class MainTest {
 
         Elements strongs = doc.select("strong");
         assertEquals(strongs.get(0).text(), "adam Music");
+    }
+
+    @Test
+    public void archiveDeviceIsSet() throws Exception {
+
     }
 }
