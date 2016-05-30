@@ -2,6 +2,7 @@ package com.thehoick.audiopila;
 
 import com.sun.java.browser.dom.DOMAccessException;
 import com.thehoick.audiopila.exc.DAOException;
+import com.thehoick.audiopila.exc.MainError;
 import com.thehoick.audiopila.model.*;
 import org.sql2o.Sql2o;
 import spark.ModelAndView;
@@ -85,6 +86,23 @@ public class Main {
                 res.redirect("/archives");
             }
             return null;
+        });
+
+        // GET /archives/:id/referesh (update Audios in Archive directory)
+        get("/archives/:id/refresh", (req, res) -> {
+            Archive archive = dao.findArchiveById(Integer.parseInt(req.params("id")));
+            archive.refreshAudios(dao);
+            res.redirect("/");
+            return null;
+        });
+
+        exception(MainError.class, (exc, req, res) -> {
+            MainError error = (MainError) exc;
+            res.status(error.getStatus());
+            res.body("<html><head><title>" + error.getStatus() +
+                    "</title></head><body>Sorry there was a problem. " +
+                    " Status: " + error.getStatus() +
+                    "</body></html>");
         });
 
         enableDebugScreen();

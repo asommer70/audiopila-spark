@@ -52,9 +52,10 @@ public class DeviceDAOTest {
     @After
     public void tearDown() throws Exception {
         // Clear the data manually.
-        String sql = "delete from devices; delete from archives; delete from sqlite_sequence;";
-        con.createQuery(sql)
-                .executeUpdate();
+        con.createQuery("delete from devices;").executeUpdate();
+        con.createQuery("delete from archives;").executeUpdate();
+        con.createQuery("delete from audios;").executeUpdate();
+        con.createQuery("delete from sqlite_sequence;").executeUpdate();
         con.close();
     }
 

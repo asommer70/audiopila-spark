@@ -1,9 +1,20 @@
 package com.thehoick.audiopila.model;
 
+import com.thehoick.audiopila.Main;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.filefilter.DirectoryFileFilter;
+import org.apache.commons.io.filefilter.RegexFileFilter;
+import org.apache.commons.io.filefilter.TrueFileFilter;
+import org.sql2o.Sql2o;
+
+import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.NotDirectoryException;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
+import java.util.List;
 
 public class Archive {
     private int id;
@@ -62,6 +73,11 @@ public class Archive {
         return deviceId;
     }
 
+    public void setDeviceId(int deviceId) {
+        this.deviceId = deviceId;
+    }
+
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -85,7 +101,27 @@ public class Archive {
         return result;
     }
 
-    public void setDeviceId(int deviceId) {
-        this.deviceId = deviceId;
-    }
+    public List<Audio> refreshAudios(Sql2oSqliteDAO dao) {
+        List<Audio> audios = new ArrayList<>();
+
+        // TODO:as maybe make the file extensions list configurable to allow for additional ones.
+        Collection files = FileUtils.listFiles(
+                new File(this.path),
+                new RegexFileFilter("([^*]+(\\.(?i)(mp3|ogg|mp4|m4a|mkv|wav))$)"),
+                DirectoryFileFilter.DIRECTORY
+        );
+
+        System.out.println("files.size(): " + files.size());
+
+        for (Object file : files) {
+            Audio audio = new Audio(file.toString(), this.id);
+            try {
+                dao.addAudio(audio);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        return audios;
+    };
+
 }

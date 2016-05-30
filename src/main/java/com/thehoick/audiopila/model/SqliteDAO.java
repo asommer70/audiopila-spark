@@ -9,6 +9,7 @@ public interface SqliteDAO {
     void addArchive(Archive archive) throws DAOException;
     List<Archive> findArchives(int deviceId) throws DAOException;
     Archive findArchiveById(int archiveId) throws DAOException;
+    Archive findArchiveByPath(String path) throws DAOException;
     Archive updateArchive(Archive archive, String field, String value) throws DAOException;
     void destroyArchive(Archive archive) throws DAOException;
 
@@ -19,4 +20,11 @@ public interface SqliteDAO {
     Device updateDevice(Device device, String field, String value) throws DAOException;
     void destroyDevice(Device device) throws DAOException;
     List<Archive> getDeviceArchives(int deviceId) throws DAOException;
+
+    void addAudio(Audio audio) throws Exception;
+    Audio findAudioById(int audioId) throws DAOException;
+    List<Audio> findAudiosByArchive(int archiveId) throws DAOException;
+    List<Audio> findAudiosByDevice(int deviceId) throws DAOException;
+    void destroyAudio(Audio audio) throws DAOException;
+    Audio updateAudio(Audio audio, String field, String value) throws Exception;
 }

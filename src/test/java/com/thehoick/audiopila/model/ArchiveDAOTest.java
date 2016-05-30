@@ -50,9 +50,10 @@ public class ArchiveDAOTest {
     @After
     public void tearDown() throws Exception {
         // Clear the data manually.
-        String sql = "delete from archives; delete from devices; delete from sqlite_sequence;";
-        con.createQuery(sql)
-            .executeUpdate();
+        con.createQuery("delete from devices;").executeUpdate();
+        con.createQuery("delete from archives;").executeUpdate();
+        con.createQuery("delete from audios;").executeUpdate();
+        con.createQuery("delete from sqlite_sequence;").executeUpdate();
         con.close();
     }
 
@@ -135,6 +136,15 @@ public class ArchiveDAOTest {
 
         assertEquals(destroyedArchive, null);
         assertEquals(dao.findArchives(device.getId()).size(), 0);
+    }
+
+    @Test
+    public void refreshAudiosCanListFiles() throws Exception {
+        Archive archive = new Archive("/Users/adam/Music");
+        archive.setDeviceId(device.getId());
+        dao.addArchive(archive);
+
+        archive.refreshAudios(dao);
     }
 
 }
